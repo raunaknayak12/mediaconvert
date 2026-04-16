@@ -147,6 +147,8 @@ def run_conversion(task_id: str, url: str, fmt: str):
             "quiet": True,
             "no_warnings": True,
             "extractor_args": {"youtube": ["player_client=ios,android"]},
+            "impersonate": "chrome",
+            "source_address": "0.0.0.0",
         }
         if fmt == "mp3":
             ydl_opts = {
