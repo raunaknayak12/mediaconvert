@@ -233,54 +233,6 @@
                 historyTbody.appendChild(tr);
             });
 
-            // Re-Convert buttons
-            var reconvertBtns = document.querySelectorAll(".redownload-btn");
-            for (var k = 0; k < reconvertBtns.length; k++) {
-                (function (btn) {
-                    btn.addEventListener("click", function () {
-                        var url = btn.getAttribute("data-url");
-                        var fmt = btn.getAttribute("data-format");
-
-                        resetUI();
-                        urlInput.value = url;
-                        urlInput.dispatchEvent(new Event("input"));
-
-                        document.getElementById("format-" + fmt).checked = true;
-                        for (var m = 0; m < formatOptions.length; m++) {
-                            formatOptions[m].classList.remove("selected");
-                        }
-                        document.getElementById("format-" + fmt + "-label").classList.add("selected");
-
-                        document.getElementById("converter").scrollIntoView({ behavior: "smooth" });
-                        setTimeout(function () {
-                            form.dispatchEvent(new Event("submit", { cancelable: true }));
-                        }, 400);
-                    });
-                })(reconvertBtns[k]);
-            }
-
-            // Delete buttons
-            var deleteBtns = document.querySelectorAll(".delete-btn");
-            for (var k = 0; k < deleteBtns.length; k++) {
-                (function (btn) {
-                    btn.addEventListener("click", function () {
-                        if (!confirm("Delete this record?")) return;
-                        var tid = btn.getAttribute("data-id");
-                        fetch("/api/history/" + tid, { method: "DELETE" })
-                        .then(function (res) {
-                            if (res.ok) {
-                                showToast("Deleted", "success");
-                                loadHistory();
-                            } else {
-                                showToast("Failed to delete", "error");
-                            }
-                        })
-                        .catch(function () {
-                            showToast("Error deleting", "error");
-                        });
-                    });
-                })(deleteBtns[k]);
-            }
         })
         .catch(function (err) {
             console.error("Failed to load history:", err);
@@ -330,6 +282,57 @@
         if (!s) return "";
         return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
+
+    // Event Delegation for History Buttons
+    document.addEventListener("click", function(e) {
+        // Delete button
+        if (e.target && e.target.classList.contains("delete-btn")) {
+            if (!confirm("Delete this record?")) return;
+            var tid = e.target.getAttribute("data-id");
+            fetch("/api/history/" + tid, { method: "DELETE" })
+            .then(function (res) {
+                if (res.ok) {
+                    showToast("Deleted", "success");
+                    loadHistory();
+                } else {
+                    showToast("Failed to delete", "error");
+                }
+            })
+            .catch(function () {
+                showToast("Error deleting", "error");
+            });
+        }
+        
+        // Re-Convert button
+        if (e.target && e.target.classList.contains("redownload-btn")) {
+            var url = e.target.getAttribute("data-url");
+            var fmt = e.target.getAttribute("data-format");
+
+            resetUI();
+            urlInput.value = url;
+            urlInput.dispatchEvent(new Event("input"));
+
+            var radioOption = document.getElementById("format-" + fmt);
+            if (radioOption) radioOption.checked = true;
+            
+            for (var m = 0; m < formatOptions.length; m++) {
+                formatOptions[m].classList.remove("selected");
+            }
+            var labelOption = document.getElementById("format-" + fmt + "-label");
+            if (labelOption) labelOption.classList.add("selected");
+
+            document.getElementById("converter").scrollIntoView({ behavior: "smooth" });
+            
+            // Trigger native form submission safely
+            setTimeout(function () {
+                if (typeof form.requestSubmit === "function") {
+                    form.requestSubmit();
+                } else {
+                    form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+                }
+            }, 400);
+        }
+    });
 
     // Init
     loadHistory();

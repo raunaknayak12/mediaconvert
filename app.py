@@ -142,12 +142,16 @@ def run_conversion(task_id: str, url: str, fmt: str):
     output_template = os.path.join(temp_dir, f"{task_id}.%(ext)s")
 
     try:
+        shared_ydl_opts = {
+            "outtmpl": output_template,
+            "quiet": True,
+            "no_warnings": True,
+            "extractor_args": {"youtube": ["player_client=ios,android"]},
+        }
         if fmt == "mp3":
             ydl_opts = {
+                **shared_ydl_opts,
                 "format": "bestaudio/best",
-                "outtmpl": output_template,
-                "quiet": True,
-                "no_warnings": True,
                 "postprocessors": [{
                     "key": "FFmpegExtractAudio",
                     "preferredcodec": "mp3",
@@ -155,12 +159,9 @@ def run_conversion(task_id: str, url: str, fmt: str):
                 }],
             }
         else:  # mp4
-            # Using b[ext=mp4]/best speeds up download massively and ensures playable format without heavy FFmpeg muxing
             ydl_opts = {
+                **shared_ydl_opts,
                 "format": "b[ext=mp4]/best",
-                "outtmpl": output_template,
-                "quiet": True,
-                "no_warnings": True,
                 "merge_output_format": "mp4",
             }
 
