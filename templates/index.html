@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MediaConvert - Convert YouTube and Instagram URLs to MP3 or MP4.">
+    <title>MediaConvert</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header id="app-header">
+        <div class="header-inner">
+            <a href="/" class="logo" id="logo">
+                <svg class="logo-svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <rect width="28" height="28" rx="6" fill="#2563eb"/>
+                    <path d="M8 9l6 5-6 5V9z" fill="#fff"/>
+                    <path d="M15 9l6 5-6 5V9z" fill="#93c5fd"/>
+                </svg>
+                <span>MediaConvert</span>
+            </a>
+            <nav class="header-nav">
+                <a href="#converter" class="nav-link" id="nav-converter">Converter</a>
+                <a href="#history-section" class="nav-link" id="nav-history">History</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="hero">
+            <h1 class="hero-title">Media URL Converter</h1>
+            <p class="hero-subtitle">
+                Paste a link from YouTube or Instagram, pick a format, and download the file directly to your device.
+            </p>
+        </section>
+
+        <section class="converter-section" id="converter">
+            <div class="card converter-card" id="converter-card">
+                <h2 class="card-title">New Conversion</h2>
+                <p class="card-desc">Paste a media URL below. We support YouTube, Instagram, TikTok, and more.</p>
+
+                <form id="convert-form" autocomplete="off">
+                    <div class="field" id="url-input-group">
+                        <label for="url-input" class="field-label">Media URL</label>
+                        <div class="field-input-wrap">
+                            <input
+                                type="url"
+                                id="url-input"
+                                name="url"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                required
+                                spellcheck="false"
+                            >
+                        </div>
+                        <span class="platform-badge" id="platform-badge"></span>
+                    </div>
+
+                    <div class="field" id="format-group">
+                        <label class="field-label">Format</label>
+                        <div class="format-options">
+                            <label class="format-option selected" id="format-mp3-label">
+                                <input type="radio" name="format" value="mp3" id="format-mp3" checked>
+                                <div class="format-card">
+                                    <span class="format-name">MP3</span>
+                                    <span class="format-desc">Audio</span>
+                                </div>
+                            </label>
+                            <label class="format-option" id="format-mp4-label">
+                                <input type="radio" name="format" value="mp4" id="format-mp4">
+                                <div class="format-card">
+                                    <span class="format-name">MP4</span>
+                                    <span class="format-desc">Video</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="convert-btn">
+                        <span class="btn-text">Convert</span>
+                    </button>
+                </form>
+
+                <div class="progress-section hidden" id="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-status" id="progress-status">Starting...</span>
+                        <span class="progress-percent" id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar-track" id="progress-bar-track">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-section hidden" id="result-section">
+                    <p class="result-title" id="result-title">Done!</p>
+                    <p class="result-info" id="result-info"></p>
+                    <button class="btn btn-success" id="download-btn">
+                        <span class="btn-text">Download</span>
+                    </button>
+                    <button class="btn btn-outline" id="new-conversion-btn">
+                        <span class="btn-text">Convert Another</span>
+                    </button>
+                </div>
+
+                <div class="error-section hidden" id="error-section">
+                    <p class="error-title">Something went wrong</p>
+                    <p class="error-message" id="error-message"></p>
+                    <button class="btn btn-outline" id="retry-btn">
+                        <span class="btn-text">Try Again</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="history-section" id="history-section">
+            <div class="card history-card">
+                <div class="card-header-row">
+                    <h2 class="card-title">Conversion History</h2>
+                    <button class="btn btn-small" id="refresh-history-btn">Refresh</button>
+                </div>
+                <div class="table-wrapper" id="history-table-wrapper">
+                    <table class="history-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>URL</th>
+                                <th>Format</th>
+                                <th>File</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                        </tbody>
+                    </table>
+                    <div class="empty-state hidden" id="empty-state">
+                        <p>No conversions yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="app-footer">
+        <p>MediaConvert &mdash; Cloud Computing Lab Project</p>
+        <p class="footer-sub">Flask &middot; yt-dlp &middot; SQLite &middot; Docker &middot; Render</p>
+    </footer>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
