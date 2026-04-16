@@ -146,7 +146,7 @@ def run_conversion(task_id: str, url: str, fmt: str):
             "outtmpl": output_template,
             "quiet": True,
             "no_warnings": True,
-            "extractor_args": {"youtube": ["player_client=ios,android"]},
+            "extractor_args": {"youtube": ["player_client=ios"]},
             "source_address": "0.0.0.0",
         }
         if fmt == "mp3":
